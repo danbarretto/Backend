@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
 
-const Signin = () => {
+const SignUp = () => {
   const [email, setEmail] = useState('');
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +29,7 @@ const Signin = () => {
             setPassword(text);
           }}
         />
-        <Button mode="contained">Signin</Button>
+        <Button mode="contained">SignUp</Button>
       </View>
     </>
   );
@@ -47,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Signin;
+export default SignUp;

@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Text, View, StyleSheet, Alert, ToastAndroid} from 'react-native';
 import {Appbar, Button, TextInput} from 'react-native-paper';
-import App from './App';
+import {app} from './config/firebase';
 
-const Login = (props) => {
+const Login = ({firebase}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
- 
+
   return (
     <>
       <View style={styles.form}>
-         
         <TextInput
           label="Email"
           onChangeText={(text) => {
@@ -24,7 +23,17 @@ const Login = (props) => {
             setPassword(text);
           }}
         />
-        <Button mode='contained'>Login</Button>
+        <Button
+          mode="contained"
+          onPress={() => {
+            app.auth().signInWithEmailAndPassword(email, password).then(user=>{
+              ToastAndroid.show(user.user.uid, ToastAndroid.SHORT)
+            }).catch(err=>{
+              ToastAndroid.show(err.message, ToastAndroid.SHORT);
+            })
+          }}>
+          Login
+        </Button>
       </View>
     </>
   );

@@ -16,15 +16,15 @@ import {
   DefaultTheme,
   Button,
 } from 'react-native-paper';
-import Signin from './Signin';
+import SignUp from './Signup';
 
 const App = () => {
   const [backAction, setBackAction] = useState(null);
   const [isChild, setIsChild] = useState(false);
   const main = (
     <Main
-      showSignin={() => {
-        setRendered(<Signin />);
+      showSignUp={() => {
+        setRendered(<SignUp />);
         setBackAction(
           <Appbar.BackAction
             onPress={() => {
