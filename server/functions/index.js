@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const path = require('path')
+const functions = require('firebase-functions')
 const app = express()
 
 app.use((req, res, next) => {
@@ -19,7 +20,6 @@ app.use((req, res, next) => {
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+require('./controller/index')(app)
 
-app.listen(5000, () => {
-  console.log('Hello at 5000')
-})
+exports.app = functions.https.onRequest(app)
