@@ -14,41 +14,37 @@ import {
   Appbar,
   Provider as PaperProvider,
   DefaultTheme,
-  Button
+  Button,
 } from 'react-native-paper';
 import Signin from './Signin';
 
 const App = () => {
   const [backAction, setBackAction] = useState(null);
-  const [isChild, setIsChild] = useState(false)
+  const [isChild, setIsChild] = useState(false);
   const main = (
-    <View style={styles.main}>
-      <Button
-        onPress={() => {
-          setRendered(<Login />);
-          setBackAction(<Appbar.BackAction />)
-        }}
-        style={styles.button}
-        mode="contained">
-        Login
-      </Button>
-      <Button onPress={()=>{
-        setIsChild(true)
+    <Main
+      showSignin={() => {
         setRendered(<Signin />);
-      }} style={styles.button} mode="contained">
-        Registrar
-      </Button>
-    </View>
+        setBackAction(
+          <Appbar.BackAction
+            onPress={() => {
+              setRendered(main);
+              setBackAction(null)
+            }}
+          />,
+        );
+      }}
+    />
   );
 
   const [rendered, setRendered] = useState(main);
-  
+
   return (
     <>
       <PaperProvider theme={theme}>
         <Appbar.Header>
+          {backAction}
           <Appbar.Content title="Crypto Checker" />
-          {isChild ? <Appbar.BackAction /> : null}
         </Appbar.Header>
         <View style={styles.container}>{rendered}</View>
       </PaperProvider>

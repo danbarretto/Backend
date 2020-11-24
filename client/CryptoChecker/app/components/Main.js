@@ -1,15 +1,14 @@
 import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Button} from 'react-native-paper'
+import Login from '../Login';
 
 const Main = (props) => {
   const [rendered, setRendered] = useState(null)
 
   return (
     <View style={styles.container}>
-      <Button onPress={props.showLogin} style={styles.button} mode="contained">
-        Login
-      </Button>
+      <Login />
       <Button onPress={props.showSignin} style={styles.button} mode="contained">
         Registrar
       </Button>
@@ -22,7 +21,7 @@ const styles = StyleSheet.create({
         width:'100%'
     },
     button:{
-        marginBottom:10
+        marginTop:10
     }
 })
 
