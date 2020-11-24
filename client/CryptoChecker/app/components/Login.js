@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Alert, ToastAndroid} from 'react-native';
-import {Appbar, Button, TextInput} from 'react-native-paper';
-import {app} from './config/firebase';
+import React, {useState, useContext} from 'react';
+import {View, StyleSheet} from 'react-native';
+import {Button, TextInput} from 'react-native-paper';
+import AuthContext from './AuthContext'
 
-const Login = ({firebase}) => {
+const Login = ({}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const {signIn} = useContext(AuthContext)
   return (
     <>
       <View style={styles.form}>
@@ -25,13 +25,7 @@ const Login = ({firebase}) => {
         />
         <Button
           mode="contained"
-          onPress={() => {
-            app.auth().signInWithEmailAndPassword(email, password).then(user=>{
-              ToastAndroid.show(user.user.uid, ToastAndroid.SHORT)
-            }).catch(err=>{
-              ToastAndroid.show(err.message, ToastAndroid.SHORT);
-            })
-          }}>
+          onPress={()=>{signIn(email, password)}}>
           Login
         </Button>
       </View>
