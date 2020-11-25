@@ -7,7 +7,7 @@ import {
   DefaultTheme,
   Appbar,
   Modal,
-  Text
+  Text,
 } from 'react-native-paper';
 import AuthContext from './components/AuthContext';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -24,7 +24,7 @@ export default App = ({}) => {
   const hideModal = () => setVisible(false);
   const [errorMessage, setErrorMessage] = useState('');
   const showModal = (message) => {
-    setErrorMessage(message)
+    setErrorMessage(message);
     setVisible(true);
   };
 
@@ -84,7 +84,7 @@ export default App = ({}) => {
               })
               .catch((err) => {
                 ToastAndroid.show(err.message, ToastAndroid.LONG);
-                showModal('Erro ao fazer login!')
+                showModal('Erro ao fazer login!');
                 dispatch({type: 'SIGN_OUT'});
               });
           })
@@ -109,28 +109,31 @@ export default App = ({}) => {
           .createUserWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
             const token = await userRecord.user.getIdToken();
+            const config = {
+              headers: {Authorization: `Bearer ${token}`},
+            };
+
             axios
               .post(
                 'http://192.168.15.16:5000/flukebackend/us-central1/app/user/addUserToDb',
                 {uid: userRecord.user.uid, userName: user},
-              )
-              .then((result) => {
+                config,
+              ).then((result) => {
                 console.log(result);
-                showModal(result.data.message)
+                showModal(result.data.message);
                 dispatch({type: 'SIGN_IN', token: token});
-              })
-              .catch((err) => {
-                showModal("Erro ao guardar informações no banco de dados!")
+              }).catch((err) => {
+                showModal('Erro ao guardar informações no banco de dados!');
               });
           })
           .catch((err) => {
-            showModal('Erro ao registrar novo usuário! '+ err.message)
+            showModal('Erro ao registrar novo usuário! ' + err.message);
           });
       },
-      showErrorModal: (message)=>{
+      showErrorModal: (message) => {
         setErrorMessage(message);
         setVisible(true);
-      }
+      },
     }),
     [],
   );
@@ -143,14 +146,8 @@ export default App = ({}) => {
           <Stack.Navigator>
             {state.userToken == null ? (
               <>
-                <Stack.Screen
-                  name="Crypto Checker"
-                  component={Main}
-                />
-                <Stack.Screen
-                  name="SignUp"
-                  component={SignUp}
-                />
+                <Stack.Screen name="Crypto Checker" component={Main} />
+                <Stack.Screen name="SignUp" component={SignUp} />
               </>
             ) : (
               <Stack.Screen name="Home" component={MainLogged} />

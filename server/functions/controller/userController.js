@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const admin = require('./admin')
-
+const verifyMiddleware = require('../middleware/verifyToken')
+router.use(verifyMiddleware)
 router.post('/addUserToDb', async(req, res)=>{
   const {uid, userName} = req.body
   console.log(req.body)
