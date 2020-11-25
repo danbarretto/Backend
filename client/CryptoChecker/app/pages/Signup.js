@@ -43,7 +43,7 @@ const SignUp = ({navigation}) => {
               showErrorModal('Preencha todos os campos!');
             else signUp(email, password, user);
           }}>
-          SignUp
+          Criar Conta
         </Button>
       </View>
     </>

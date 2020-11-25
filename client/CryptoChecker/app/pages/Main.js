@@ -7,7 +7,7 @@ const Main = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Login />
-      <Button onPress={()=>{navigation.navigate('SignUp');}} style={styles.button} mode="contained">
+      <Button onPress={()=>{navigation.navigate('Criar Conta');}} style={styles.button} mode="contained">
         Registrar
       </Button>
     </View>

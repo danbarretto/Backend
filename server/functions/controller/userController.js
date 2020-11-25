@@ -8,7 +8,7 @@ router.use(verifyMiddleware)
 
 router.post('/addUserToDb', async (req, res) => {
   const { userName } = req.body
-  const { uid } = req.user.uid
+  const { uid } = req.user
   console.log(req.body)
   admin
     .firestore()
@@ -29,7 +29,7 @@ router.post('/addUserToDb', async (req, res) => {
 
 router.post('/addCryptoCurrency', async (req, res) => {
   const { currencies } = req.body
-  const { uid } = req.user.uid
+  const { uid } = req.user
   const userRef = admin.firestore().collection('users').doc(uid)
   const getDoc = await userRef.get()
   try {
@@ -51,6 +51,15 @@ router.post('/addCryptoCurrency', async (req, res) => {
       .status(400)
       .send({ message: 'Erro ao atualizar cripto moedas! ' + err.message })
   }
+})
+
+router.get('/getCurrencies',async (req,res)=>{
+  const uid = req.user.uid
+  const userRef = await admin.firestore().collection('users').doc(uid).get()
+  if(userRef.exists){
+    return res.send({currencies:userRef.get('currencies')})
+  }
+  return res.status(404).send({message:'Você não possui nenhuma cripto moeda cadastrada!'})
 })
 
 module.exports = (app) => app.use('/user', router)

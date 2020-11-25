@@ -1,7 +1,5 @@
 import 'react-native-gesture-handler';
 import React, {useEffect, useMemo, useState} from 'react';
-import * as SecureStore from 'expo-secure-store';
-import {StyleSheet, ToastAndroid} from 'react-native';
 import {
   Provider as PaperProvider,
   DefaultTheme,
@@ -17,6 +15,8 @@ import SignUp from './pages/Signup';
 import {app} from './config/firebase';
 import {NavigationContainer} from '@react-navigation/native';
 import axios from 'axios';
+import SInfo from 'react-native-sensitive-info';
+
 const Stack = createStackNavigator();
 
 export default App = ({}) => {
@@ -61,7 +61,7 @@ export default App = ({}) => {
     const bootstrapAsync = async () => {
       let userToken;
       try {
-        userToken = await SecureStore.getItemAsync('userToken');
+        userToken = await SInfo.getItem('token',{});
       } catch (e) {
         dispatch({type: 'SIGN_OUT'});
       }
@@ -78,12 +78,11 @@ export default App = ({}) => {
           .signInWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
             const token = await userRecord.user.getIdToken(true);
-            SecureStore.setItemAsync('userToken', token)
+            SInfo.setItem('token', token, {})
               .then(() => {
                 dispatch({type: 'SIGN_IN', token: token});
               })
               .catch((err) => {
-                ToastAndroid.show(err.message, ToastAndroid.LONG);
                 showModal('Erro ao fazer login!');
                 dispatch({type: 'SIGN_OUT'});
               });
@@ -95,13 +94,11 @@ export default App = ({}) => {
       },
       signOut: () => {
         app.auth().signOut();
-        SecureStore.deleteItemAsync('userToken')
-          .then(() => {
-            dispatch({type: 'SIGN_OUT'});
-          })
-          .catch((err) => {
-            showModal('Erro ao realizar logout!');
-          });
+        SInfo.deleteItem('token', {}).then(() => {
+          dispatch({type: 'SIGN_OUT'});
+        }).catch(err=>{
+          showModal('Erro ao realizar logout!');
+        })
       },
       signUp: async (email, password, user) => {
         app
@@ -118,11 +115,13 @@ export default App = ({}) => {
                 'http://192.168.15.16:5000/flukebackend/us-central1/app/user/addUserToDb',
                 {uid: userRecord.user.uid, userName: user},
                 config,
-              ).then((result) => {
+              )
+              .then((result) => {
                 console.log(result);
                 showModal(result.data.message);
                 dispatch({type: 'SIGN_IN', token: token});
-              }).catch((err) => {
+              })
+              .catch((err) => {
                 showModal('Erro ao guardar informações no banco de dados!');
               });
           })
@@ -147,10 +146,14 @@ export default App = ({}) => {
             {state.userToken == null ? (
               <>
                 <Stack.Screen name="Crypto Checker" component={Main} />
-                <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen name="Criar Conta" component={SignUp} />
               </>
             ) : (
-              <Stack.Screen name="Home" component={MainLogged} />
+              <Stack.Screen
+                options={{headerShown: false}}
+                name="Home"
+                component={MainLogged}
+              />
             )}
           </Stack.Navigator>
           <Modal

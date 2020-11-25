@@ -40,7 +40,7 @@ module.exports = async (req, res, next) => {
 
   try {
     const decodedIdToken = await admin.auth().verifyIdToken(idToken)
-    console.log('ID Token correctly decoded', decodedIdToken)
+    //console.log('ID Token correctly decoded', decodedIdToken)
     req.user = decodedIdToken
     next()
     return

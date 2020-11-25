@@ -4,14 +4,16 @@ import {Text} from 'react-native';
 import {Button} from 'react-native-paper';
 import AuthContext from '../components/AuthContext';
 
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import YourCoins from './YourCoins';
+const Tab = createBottomTabNavigator();
+
 const MainLogged = ({navigation}) => {
-  const {signOut} = React.useContext(AuthContext)
   return (
-    <>
-      <Button onPress={()=>{signOut()}}>Pls work</Button>
-      <Text>Ayyyyy</Text>
-    </>
+      <Tab.Navigator>
+        <Tab.Screen name='Home' component={YourCoins}/>
+      </Tab.Navigator>
   );
 };
 
-export default MainLogged
+export default MainLogged;
