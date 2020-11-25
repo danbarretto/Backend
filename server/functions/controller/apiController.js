@@ -2,19 +2,15 @@ const axios = require('axios').default
 const express = require('express')
 const router = express.Router()
 const verifyMiddleware = require('../middleware/verifyToken')
-const apiKey = require('../config/apikey.json')
-const config = {
-  headers: {
-    authorization: apiKey.key,
-  },
-}
+const apikey = require('../config/apikey.json')
+
 //router.use(verifyMiddleware)
 
 router.get('/topList', (req, res) => {
   axios
     .get(
       'https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=BRL',
-      config
+      apikey
     )
     .then((result) => {
       const topList = result.data.Data.map((currency) => {
@@ -33,13 +29,17 @@ router.get('/searchCurrency', (req, res) => {
   const { coinName } = req.query
   axios
     .get(
-      `https://min-api.cryptocompare.com/data/price?fsym=${coinName}&tsyms=BRL`,
-      config
+      `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${coinName}&tsyms=BRL`,
+      apikey
     )
-    .then((price) => {
-      if (price.data.Response === 'Error')
+    .then((currency) => {
+      console.log(currency.data)
+      if (currency.data.Response === 'Error')
         res.status(404).send({ message: 'Moeda não encontrada' })
-      else res.send({ price: price.data.BRL })
+      else {
+
+        res.send({ currency: currency.data })
+      }
     })
     .catch((err) => {
       res.status(400).send({ message: 'Erro ao pesquisar moeda!', err })
@@ -54,12 +54,15 @@ router.post('/getPrices', (req, res) => {
   })
   console.log(namesUrl)
   const url = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${namesUrl}&tsyms=BRL`
-  axios.get(url, config).then(result=>{
-    //const prices = Object.keys(result.data).map(val=>({name:val, price:result.data[val].BRL}))
-    return res.send(result.data)
-  }).catch(err=>{
-    return res.status(500).send({message:'Erro ao resgatar preços'})
-  })
+  axios
+    .get(url, apikey)
+    .then((result) => {
+      //const prices = Object.keys(result.data).map(val=>({name:val, price:result.data[val].BRL}))
+      return res.send(result.data)
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: 'Erro ao resgatar preços' })
+    })
 })
 
 router.get('/historicalData', (req, res) => {
@@ -67,7 +70,7 @@ router.get('/historicalData', (req, res) => {
   axios
     .get(
       `https://min-api.cryptocompare.com/data/v2/histoday?fsym=${coinName}&tsym=BRL&limit=${time}`,
-      config
+      apikey
     )
     .then((result) => {
       res.send(result.data.Data)

@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const admin = require('./admin')
 const verifyMiddleware = require('../middleware/verifyToken')
-const { user } = require('firebase-functions/lib/providers/auth')
+const axios = require('axios').default
+const apikey = require('../config/apikey.json')
 
 router.use(verifyMiddleware)
 
@@ -28,38 +29,49 @@ router.post('/addUserToDb', async (req, res) => {
 })
 
 router.post('/addCryptoCurrency', async (req, res) => {
-  const { currencies } = req.body
+  const { currency, qtd } = req.body
   const { uid } = req.user
-  const userRef = admin.firestore().collection('users').doc(uid)
-  const getDoc = await userRef.get()
-  try {
-    if (getDoc.exists) {
-      if (getDoc.get('currencies') === null) {
-        await userRef.set({ currencies })
-      } else {
-        let oldCurrencies = getDoc.get('currencies')
-        currencies.forEach((currency) => {
-          const { currencyName, qtd } = currency
-          oldCurrencies[currencyName] = qtd
-        })
-        await userRef.set({ currencies: oldCurrencies })
+  const userRef = await admin.firestore().collection('users').doc(uid).get()
+  let oldCurrencies = userRef.get('currencies')
+  if (userRef.exists) {
+    for (curr of oldCurrencies) {
+      console.log(curr)
+      if (curr.Name === currency.toUpperCase()) {
+        return res.send({ message: 'Você já possui esta moeda!' })
       }
-      return res.sendStatus(200)
     }
-  } catch (err) {
-    return res
-      .status(400)
-      .send({ message: 'Erro ao atualizar cripto moedas! ' + err.message })
+
+    axios
+      .get(
+        `https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=BRL`,
+        apikey
+      )
+      .then((result) => {
+        if(result.data.Response !== 'Error'){
+
+          oldCurrencies.push({ Name: currency.toUpperCase(), Quantidade: qtd })
+          userRef.ref
+          .set({ currencies: oldCurrencies })
+          .then(() => {
+            return res.sendStatus(200)
+          })
+          .catch((err) => {
+            return res.send({ message: 'Erro ao salvar moeda' })
+          })
+        }else return res.send({message:'Moeda não encontrada!'})
+      })
   }
 })
 
-router.get('/getCurrencies',async (req,res)=>{
+router.get('/getCurrencies', async (req, res) => {
   const uid = req.user.uid
   const userRef = await admin.firestore().collection('users').doc(uid).get()
-  if(userRef.exists){
-    return res.send({currencies:userRef.get('currencies')})
+  if (userRef.exists) {
+    return res.send({ currencies: userRef.get('currencies') })
   }
-  return res.status(404).send({message:'Você não possui nenhuma cripto moeda cadastrada!'})
+  return res
+    .status(404)
+    .send({ message: 'Você não possui nenhuma cripto moeda cadastrada!' })
 })
 
 module.exports = (app) => app.use('/user', router)
