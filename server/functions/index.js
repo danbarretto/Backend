@@ -21,5 +21,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 require('./controller/index')(app)
+app.get('/', (req,res)=>{
+  return res.send('heyall')
+})
 
 exports.app = functions.https.onRequest(app)

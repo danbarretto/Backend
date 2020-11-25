@@ -3,8 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import {Button} from 'react-native-paper';
 import Login from '../components/Login';
 
-const Main = ({ navigation}) => {
-  
+const Main = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Login />

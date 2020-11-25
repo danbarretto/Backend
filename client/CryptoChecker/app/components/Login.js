@@ -1,12 +1,12 @@
 import React, {useState, useContext} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
-import AuthContext from './AuthContext'
+import AuthContext from './AuthContext';
 
 const Login = ({}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const {signIn} = useContext(AuthContext)
+  const {signIn, showErrorModal} = useContext(AuthContext);
   return (
     <>
       <View style={styles.form}>
@@ -25,7 +25,10 @@ const Login = ({}) => {
         />
         <Button
           mode="contained"
-          onPress={()=>{signIn(email, password)}}>
+          onPress={() => {
+            if(email === '' || password === '') showErrorModal('Preencha todos os campos!')
+            else signIn(email, password);
+          }}>
           Login
         </Button>
       </View>

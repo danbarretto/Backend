@@ -1,11 +1,13 @@
-import 'react-native-gesture-handler'
-import React, {useEffect, useMemo} from 'react';
+import 'react-native-gesture-handler';
+import React, {useEffect, useMemo, useState} from 'react';
 import * as SecureStore from 'expo-secure-store';
 import {StyleSheet, ToastAndroid} from 'react-native';
 import {
   Provider as PaperProvider,
   DefaultTheme,
   Appbar,
+  Modal,
+  Text
 } from 'react-native-paper';
 import AuthContext from './components/AuthContext';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -14,9 +16,18 @@ import Main from './pages/Main';
 import SignUp from './pages/Signup';
 import {app} from './config/firebase';
 import {NavigationContainer} from '@react-navigation/native';
+import axios from 'axios';
 const Stack = createStackNavigator();
 
 export default App = ({}) => {
+  const [visible, setVisible] = useState(false);
+  const hideModal = () => setVisible(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const showModal = (message) => {
+    setErrorMessage(message)
+    setVisible(true);
+  };
+
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
@@ -46,19 +57,18 @@ export default App = ({}) => {
       userToken: null,
     },
   );
-  /*useEffect(() => {
+  useEffect(() => {
     const bootstrapAsync = async () => {
       let userToken;
       try {
         userToken = await SecureStore.getItemAsync('userToken');
-        console.log(userToken)
       } catch (e) {
-        dispatch({type:'SIGN_OUT'})
+        dispatch({type: 'SIGN_OUT'});
       }
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     };
     bootstrapAsync();
-  }, []);*/
+  }, []);
 
   const authContext = useMemo(
     () => ({
@@ -68,26 +78,63 @@ export default App = ({}) => {
           .signInWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
             const token = await userRecord.user.getIdToken(true);
-            console.log(token)
-            SecureStore.setItemAsync('userToken', token).then(()=>{
-              dispatch({type: 'SIGN_IN', token: token});
-            }).catch(err=>{
-              ToastAndroid.show(err.message, ToastAndroid.LONG)
-              dispatch({type:'SIGN_OUT'})
-            })
+            SecureStore.setItemAsync('userToken', token)
+              .then(() => {
+                dispatch({type: 'SIGN_IN', token: token});
+              })
+              .catch((err) => {
+                ToastAndroid.show(err.message, ToastAndroid.LONG);
+                showModal('Erro ao fazer login!')
+                dispatch({type: 'SIGN_OUT'});
+              });
           })
-          .catch(() => {
+          .catch((err) => {
+            showModal('Erro ao fazer login!');
             dispatch({type: 'SIGN_OUT'});
           });
       },
-      signOut: () => dispatch({type: 'SIGN_OUT'}),
-      signUp: async () => {
-        //firebase create user
-        dispatch({type: 'SIGN_IN', token: 'dummy'});
+      signOut: () => {
+        app.auth().signOut();
+        SecureStore.deleteItemAsync('userToken')
+          .then(() => {
+            dispatch({type: 'SIGN_OUT'});
+          })
+          .catch((err) => {
+            showModal('Erro ao realizar logout!');
+          });
       },
+      signUp: async (email, password, user) => {
+        app
+          .auth()
+          .createUserWithEmailAndPassword(email, password)
+          .then(async (userRecord) => {
+            const token = await userRecord.user.getIdToken();
+            axios
+              .post(
+                'http://192.168.15.16:5000/flukebackend/us-central1/app/user/addUserToDb',
+                {uid: userRecord.user.uid, userName: user},
+              )
+              .then((result) => {
+                console.log(result);
+                showModal(result.data.message)
+                dispatch({type: 'SIGN_IN', token: token});
+              })
+              .catch((err) => {
+                showModal("Erro ao guardar informações no banco de dados!")
+              });
+          })
+          .catch((err) => {
+            showModal('Erro ao registrar novo usuário! '+ err.message)
+          });
+      },
+      showErrorModal: (message)=>{
+        setErrorMessage(message);
+        setVisible(true);
+      }
     }),
     [],
   );
+  const containerStyle = {backgroundColor: 'white', padding: 20};
 
   return (
     <NavigationContainer>
@@ -96,13 +143,25 @@ export default App = ({}) => {
           <Stack.Navigator>
             {state.userToken == null ? (
               <>
-                <Stack.Screen name="Crypto Checker" component={Main} />
-                <Stack.Screen name="SignUp" component={SignUp} />
+                <Stack.Screen
+                  name="Crypto Checker"
+                  component={Main}
+                />
+                <Stack.Screen
+                  name="SignUp"
+                  component={SignUp}
+                />
               </>
             ) : (
               <Stack.Screen name="Home" component={MainLogged} />
             )}
           </Stack.Navigator>
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={containerStyle}>
+            <Text>{errorMessage}</Text>
+          </Modal>
         </AuthContext.Provider>
       </PaperProvider>
     </NavigationContainer>
