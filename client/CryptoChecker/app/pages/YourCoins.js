@@ -1,17 +1,17 @@
 import React, {useEffect, useState, useContext} from 'react';
-import {Button, DataTable, ActivityIndicator} from 'react-native-paper';
+import {Button, DataTable, ActivityIndicator, FAB} from 'react-native-paper';
 import axios from 'axios';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import AuthContext from '../components/AuthContext';
 import SInfo from 'react-native-sensitive-info';
 import AddCoin from '../components/AddCoin';
 
-const YourCoins = ({navigation}) => {
+const YourCoins = ({setCoinName}) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [addCoin, setAddCoin] = useState(false);
   let config;
-  const {showErrorModal, signOut} = useContext(AuthContext);
+  const {showErrorModal} = useContext(AuthContext);
   const fetchData = async () => {
     setLoading(true);
     const token = await SInfo.getItem('token', {});
@@ -39,10 +39,14 @@ const YourCoins = ({navigation}) => {
         }));
         const newRows = currencies.map((currency) => {
           return (
-            <DataTable.Row key={currency.Name}>
+            <DataTable.Row key={currency.Name} onPress={()=>{
+              setCoinName(currency.Name)
+            }}>
               <DataTable.Cell centered>{currency.Name}</DataTable.Cell>
-              <DataTable.Cell centered>{currency.price.toFixed(2)}</DataTable.Cell>
-              <DataTable.Cell centered >{currency.Quantidade}</DataTable.Cell>
+              <DataTable.Cell centered>
+                {currency.price.toFixed(2)}
+              </DataTable.Cell>
+              <DataTable.Cell centered>{currency.Quantidade}</DataTable.Cell>
               <DataTable.Cell centered>
                 {(currency.Quantidade * currency.price).toFixed(2)}
               </DataTable.Cell>
@@ -62,8 +66,8 @@ const YourCoins = ({navigation}) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <DataTable  style={styles.table}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <DataTable>
         <DataTable.Header>
           <DataTable.Title>Moeda</DataTable.Title>
           <DataTable.Title numberOfLines={2}>Valor Un (R$)</DataTable.Title>
@@ -79,9 +83,16 @@ const YourCoins = ({navigation}) => {
       />
       <ActivityIndicator animating={loading} size={'large'} />
       {!addCoin ? (
-        <Button onPress={() => setAddCoin(true)}>Adicionar Moeda</Button>
+        <FAB
+          mode="outlined"
+          icon="plus"
+          style={styles.fab}
+          onPress={() => setAddCoin(true)}
+        />
       ) : null}
-    </View>
+
+
+    </ScrollView>
   );
 };
 
@@ -89,9 +100,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 30,
   },
-  table: {},
+  fab: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
+    //backgroundColor: '#7a7985',
+  },
 });
 
 export default YourCoins;

@@ -1,18 +1,14 @@
 import 'react-native-gesture-handler';
 import React, {useState} from 'react';
-import {Text} from 'react-native';
-import {Appbar, Button, ThemeProvider} from 'react-native-paper';
-import AuthContext from '../components/AuthContext';
-
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import YourCoins from './YourCoins';
+import {Appbar} from 'react-native-paper';
 import AppBarMenu from '../components/AppBarMenu';
-import TopCurrencies from './TopCurrencies';
-const Tab = createBottomTabNavigator();
+import BottomBar from '../components/BottomBar'
+import CoinHistory from './CoinHistory';
+
 
 const MORE_ICON = Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical';
 
-const MainLogged = ({navigation}) => {
+const MainLogged = ({}) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const closeMenu = () => setMenuVisible(false);
   return (
@@ -34,10 +30,7 @@ const MainLogged = ({navigation}) => {
           }
         />
       </Appbar.Header>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={YourCoins} />
-        <Tab.Screen name="Top Moedas" component={TopCurrencies} />
-      </Tab.Navigator>
+      <BottomBar />
     </>
   );
 };

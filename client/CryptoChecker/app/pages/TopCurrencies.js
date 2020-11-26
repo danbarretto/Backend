@@ -13,13 +13,16 @@ import NumberPicker from '../components/NumberPicker';
 const {width} = Dimensions.get('window');
 import {Col, Grid, Row} from 'react-native-easy-grid';
 import {ScrollView} from 'react-native-gesture-handler';
-const TopCurrencies = () => {
-  const [rows, setRows] = useState([]);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+const TopCurrencies = ({setCoinName}) => {
   const [number, setNumber] = useState(10);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(false);
+
+
   const fetchData = async () => {
-    setLoading(true)
+    setLoading(true);
     const token = await SInfo.getItem('token', {});
     const config = {
       headers: {
@@ -37,7 +40,9 @@ const TopCurrencies = () => {
         let rank = 0;
         const newRows = res.data.topList.map((curr) => {
           return (
-            <DataTable.Row key={curr.name}>
+            <DataTable.Row key={curr.name} onPress={()=>{
+              setCoinName(curr.name)
+            }}>
               <DataTable.Cell>{++rank}</DataTable.Cell>
               <DataTable.Cell>{curr.fullName}</DataTable.Cell>
               <DataTable.Cell>{curr.name}</DataTable.Cell>
@@ -49,7 +54,7 @@ const TopCurrencies = () => {
         setLoading(false);
       });
   };
-  const width = useEffect(() => {
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -66,31 +71,25 @@ const TopCurrencies = () => {
       </DataTable>
       <ActivityIndicator animating={loading} size={'large'} />
       <Text style={{paddingLeft: 15}}>Tamanho do Rank</Text>
-      <Grid style={{padding: 15}}>
+      {!visible && <Grid style={{padding: 15}}>
         <Col>
           <NumberPicker
-            visible={menuVisible}
             closeMenu={() => setMenuVisible(false)}
+            values={[10, 20, 30]}
+            label="Tamanho do Rank"
+            number={number}
             setNumber={setNumber}
-            anchorButton={
-              <Button
-                style={styles.picker}
-                mode={'outlined'}
-                onTouchEnd={() => setMenuVisible(true)}
-                label="Número de Moedas na lista">
-                {number}
-              </Button>
-            }
           />
         </Col>
         <Col>
           <Button
             mode="contained"
             style={styles.picker}
-            
-            onPress={() => fetchData()}>Carregar</Button>
+            onPress={() => fetchData()}>
+            Carregar
+          </Button>
         </Col>
-      </Grid>
+      </Grid>}
     </ScrollView>
   );
 };

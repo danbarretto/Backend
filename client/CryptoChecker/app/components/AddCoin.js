@@ -49,6 +49,7 @@ const AddCoin = ({visibleInit, hideDialog, refreshData}) => {
         <TextInput
           keyboardType="numeric"
           label="Quantidade"
+          style={{marginTop:10}}
           onChangeText={(text) => setQtd(text)}></TextInput>
       </Dialog.Content>
       <Dialog.Actions>

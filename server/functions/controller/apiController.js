@@ -7,14 +7,15 @@ const apikey = require('../config/apikey.json')
 //router.use(verifyMiddleware)
 
 router.get('/topList', (req, res) => {
-  const {number} = req.query
+  const { number } = req.query
   axios
     .get(
-      `https://min-api.cryptocompare.com/data/top/totalvolfull?&tsym=BRL&limit=${parseInt(number)}`,
+      `https://min-api.cryptocompare.com/data/top/totalvolfull?&tsym=BRL&limit=${parseInt(
+        number
+      )}`,
       apikey
     )
     .then((result) => {
-
       const topList = result.data.Data.map((currency) => {
         return {
           name: currency.CoinInfo.Name,
@@ -38,7 +39,6 @@ router.get('/searchCurrency', (req, res) => {
       if (currency.data.Response === 'Error')
         res.status(404).send({ message: 'Moeda não encontrada' })
       else {
-
         res.send({ currency: currency.data })
       }
     })
@@ -74,10 +74,22 @@ router.get('/historicalData', (req, res) => {
       apikey
     )
     .then((result) => {
-      res.send(result.data.Data)
+      const data = result.data.Data.Data.map((day) => {
+        
+        const timeStamp = day.time
+
+        const date = new Date(timeStamp * 1000)
+        const dayString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+        const temp = {
+          time: dayString,
+          price: day.close,
+        }
+        return temp
+      })
+      return res.send({ historic: data })
     })
     .catch((err) => {
-      res.send(err)
+      return res.send(err)
     })
 })
 

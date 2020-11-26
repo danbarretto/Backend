@@ -1,32 +1,51 @@
-import React, {useContext} from 'react';
-import {Menu} from 'react-native-paper';
+import React, { useEffect, useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {Button, Menu} from 'react-native-paper';
 
-const NumberPicker = ({visible, closeMenu, anchorButton, setNumber}) => {
+const NumberPicker = ({ number, setNumber, values, label, style}) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    setItems(
+      values.map((val) => (
+        <Menu.Item
+          key={val}
+          title={val}
+          onPress={() => {
+            setNumber(val);
+            setMenuVisible(false)
+          }}
+        />
+      )),
+    );
+  }, []);
+
   return (
-    <Menu visible={visible} onDismiss={closeMenu} anchor={anchorButton}>
-      <Menu.Item
-        title="10"
-        onPress={() => {
-          setNumber(10);
-          closeMenu();
-        }}
-      />
-      <Menu.Item
-        title="20"
-        onPress={() => {
-          setNumber(20);
-          closeMenu();
-        }}
-      />
-      <Menu.Item
-        title="30"
-        onPress={() => {
-          setNumber(30);
-          closeMenu();
-        }}
-      />
+    <Menu
+      visible={menuVisible}
+      onDismiss={()=>setMenuVisible(false)}
+      anchor={
+        <Button
+          style={{...styles.picker, ...style}}
+          mode={'outlined'}
+          onPress={() => setMenuVisible(true)}
+          label={label}>
+          {number}
+        </Button>
+      }>
+      {items}
     </Menu>
   );
 };
+
+const styles = StyleSheet.create({
+  picker: {
+    //marginTop: 15,
+    marginBottom: 15,
+    height:40
+  },
+});
 
 export default NumberPicker;
