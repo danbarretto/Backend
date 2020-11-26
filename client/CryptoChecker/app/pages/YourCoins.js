@@ -41,10 +41,10 @@ const YourCoins = ({navigation}) => {
           return (
             <DataTable.Row key={currency.Name}>
               <DataTable.Cell centered>{currency.Name}</DataTable.Cell>
-              <DataTable.Cell centered>{currency.price}</DataTable.Cell>
+              <DataTable.Cell centered>{currency.price.toFixed(2)}</DataTable.Cell>
               <DataTable.Cell centered >{currency.Quantidade}</DataTable.Cell>
               <DataTable.Cell centered>
-                {currency.Quantidade * currency.price}
+                {(currency.Quantidade * currency.price).toFixed(2)}
               </DataTable.Cell>
             </DataTable.Row>
           );
@@ -63,12 +63,12 @@ const YourCoins = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <DataTable style={styles.table}>
+      <DataTable  style={styles.table}>
         <DataTable.Header>
           <DataTable.Title>Moeda</DataTable.Title>
-          <DataTable.Title>Valor Un (R$)</DataTable.Title>
-          <DataTable.Title >Quantidade</DataTable.Title>
-          <DataTable.Title>Total (R$)</DataTable.Title>
+          <DataTable.Title numberOfLines={2}>Valor Un (R$)</DataTable.Title>
+          <DataTable.Title>Quantidade</DataTable.Title>
+          <DataTable.Title numberOfLines={2}>Total (R$)</DataTable.Title>
         </DataTable.Header>
         {!loading && rows}
       </DataTable>
@@ -81,7 +81,6 @@ const YourCoins = ({navigation}) => {
       {!addCoin ? (
         <Button onPress={() => setAddCoin(true)}>Adicionar Moeda</Button>
       ) : null}
-      {!addCoin ? <Button onPress={() => signOut()}>Logout</Button> : null}
     </View>
   );
 };

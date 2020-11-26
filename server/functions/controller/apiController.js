@@ -7,14 +7,15 @@ const apikey = require('../config/apikey.json')
 //router.use(verifyMiddleware)
 
 router.get('/topList', (req, res) => {
+  const {number} = req.query
   axios
     .get(
-      'https://min-api.cryptocompare.com/data/top/totalvolfull?limit=10&tsym=BRL',
+      `https://min-api.cryptocompare.com/data/top/totalvolfull?&tsym=BRL&limit=${parseInt(number)}`,
       apikey
     )
     .then((result) => {
+
       const topList = result.data.Data.map((currency) => {
-        //console.log(currency)
         return {
           name: currency.CoinInfo.Name,
           fullName: currency.CoinInfo.FullName,

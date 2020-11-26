@@ -35,7 +35,6 @@ router.post('/addCryptoCurrency', async (req, res) => {
   let oldCurrencies = userRef.get('currencies')
   if (userRef.exists) {
     for (curr of oldCurrencies) {
-      console.log(curr)
       if (curr.Name === currency.toUpperCase()) {
         return res.send({ message: 'Você já possui esta moeda!' })
       }
