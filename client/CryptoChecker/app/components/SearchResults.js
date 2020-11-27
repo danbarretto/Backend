@@ -9,7 +9,7 @@ const SearchResults = ({search, setCoinHistory}) => {
 
   const fetchData = async () => {
     setLoading(true);
-    const url = `http://192.168.15.16:5000/flukebackend/us-central1/app/api/searchCurrency?coinName=${search}`;
+    const url = `https://us-central1-flukebackend.cloudfunctions.net/app/api/searchCurrency?coinName=${search}`;
     const token = await SInfo.getItem('token', {});
     const config = {
       headers: {

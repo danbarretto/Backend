@@ -33,16 +33,18 @@ const TopCurrencies = ({setCoinName}) => {
     };
     axios
       .get(
-        `http://192.168.15.16:5000/flukebackend/us-central1/app/api/topList?&number=${number}`,
+        `https://us-central1-flukebackend.cloudfunctions.net/app/api/topList?&number=${number}`,
         config,
       )
       .then((res) => {
         let rank = 0;
         const newRows = res.data.topList.map((curr) => {
           return (
-            <DataTable.Row key={curr.name} onPress={()=>{
-              setCoinName(curr.name)
-            }}>
+            <DataTable.Row
+              key={curr.name}
+              onPress={() => {
+                setCoinName(curr.name);
+              }}>
               <DataTable.Cell>{++rank}</DataTable.Cell>
               <DataTable.Cell>{curr.fullName}</DataTable.Cell>
               <DataTable.Cell>{curr.name}</DataTable.Cell>

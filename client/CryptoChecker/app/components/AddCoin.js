@@ -19,17 +19,17 @@ const AddCoin = ({visibleInit, hideDialog, refreshData}) => {
     };
     axios
       .post(
-        'http://192.168.15.16:5000/flukebackend/us-central1/app/user/addCryptoCurrency',
+        'https://us-central1-flukebackend.cloudfunctions.net/app/user/addCryptoCurrency',
         {currency: code, qtd},
         config,
       )
       .then((res) => {
         if (res.data.message === undefined) {
           alert('Moeda cadastrada com sucesso!');
-          refreshData()
+          refreshData();
           hideDialog();
         } else {
-          console.log(res.data)
+          console.log(res.data);
           alert(res.data.message);
           hideDialog();
         }

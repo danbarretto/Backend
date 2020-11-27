@@ -79,7 +79,7 @@ export default App = ({}) => {
       //Checks token validation
       axios
         .get(
-          'http://192.168.15.16:5000/flukebackend/us-central1/app/user/',
+          'https://us-central1-flukebackend.cloudfunctions.net/app/user/',
           config,
         )
         .then((res) => {
@@ -144,7 +144,7 @@ export default App = ({}) => {
 
             axios
               .post(
-                'http://192.168.15.16:5000/flukebackend/us-central1/app/user/addUserToDb',
+                'https://us-central1-flukebackend.cloudfunctions.net/app/user/addUserToDb',
                 {uid: userRecord.user.uid, userName: user},
                 config,
               )

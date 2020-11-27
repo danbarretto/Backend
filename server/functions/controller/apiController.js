@@ -4,7 +4,7 @@ const router = express.Router()
 const verifyMiddleware = require('../middleware/verifyToken')
 const apikey = require('../config/apikey.json')
 
-//router.use(verifyMiddleware)
+router.use(verifyMiddleware)
 
 router.get('/topList', (req, res) => {
   const { number } = req.query
@@ -24,6 +24,9 @@ router.get('/topList', (req, res) => {
         }
       })
       return res.send({ topList })
+    }).catch(err=>{
+      
+      return res.status(500).send({message:'Erro ao tentar carregar top list '+err.message})
     })
 })
 
@@ -68,7 +71,7 @@ router.post('/getPrices', (req, res) => {
       return res.send(result.data)
     })
     .catch((err) => {
-      return res.status(500).send({ message: 'Erro ao resgatar preços' })
+      return res.status(500).send({ message: 'Erro ao resgatar preços '+err.message })
     })
 })
 

@@ -22,7 +22,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
         Authorization: `Bearer ${token}`,
       },
     };
-    const url = `http://192.168.15.16:5000/flukebackend/us-central1/app/api/historicalData?coinName=${coinName}&time=${number}`;
+    const url = `https://us-central1-flukebackend.cloudfunctions.net/app/api/historicalData?coinName=${coinName}&time=${number}`;
     axios
       .get(url, config)
       .then((res) => {

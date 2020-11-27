@@ -22,13 +22,13 @@ const YourCoins = ({setCoinName}) => {
     };
     axios
       .get(
-        'http://192.168.15.16:5000/flukebackend/us-central1/app/user/getCurrencies',
+        'https://us-central1-flukebackend.cloudfunctions.net/app/user/getCurrencies',
         config,
       )
       .then(async (result) => {
         const coins = result.data.currencies.map((curr) => curr.Name);
         const prices = await axios.post(
-          'http://192.168.15.16:5000/flukebackend/us-central1/app/api/getPrices',
+          'https://us-central1-flukebackend.cloudfunctions.net/app/api/getPrices',
           {names: coins},
           config,
         );
@@ -39,9 +39,11 @@ const YourCoins = ({setCoinName}) => {
         }));
         const newRows = currencies.map((currency) => {
           return (
-            <DataTable.Row key={currency.Name} onPress={()=>{
-              setCoinName(currency.Name)
-            }}>
+            <DataTable.Row
+              key={currency.Name}
+              onPress={() => {
+                setCoinName(currency.Name);
+              }}>
               <DataTable.Cell centered>{currency.Name}</DataTable.Cell>
               <DataTable.Cell centered>
                 {currency.price.toFixed(2)}
