@@ -7,6 +7,11 @@ const apikey = require('../config/apikey.json')
 
 router.use(verifyMiddleware)
 
+router.get('/', async(req, res)=>{
+  console.log('validating token')
+  return res.send({message:'Your token is valid!'})
+})
+
 router.post('/addUserToDb', async (req, res) => {
   const { userName } = req.body
   const { uid } = req.user
@@ -46,18 +51,17 @@ router.post('/addCryptoCurrency', async (req, res) => {
         apikey
       )
       .then((result) => {
-        if(result.data.Response !== 'Error'){
-
+        if (result.data.Response !== 'Error') {
           oldCurrencies.push({ Name: currency.toUpperCase(), Quantidade: qtd })
           userRef.ref
-          .set({ currencies: oldCurrencies })
-          .then(() => {
-            return res.sendStatus(200)
-          })
-          .catch((err) => {
-            return res.send({ message: 'Erro ao salvar moeda' })
-          })
-        }else return res.send({message:'Moeda não encontrada!'})
+            .set({ currencies: oldCurrencies })
+            .then(() => {
+              return res.sendStatus(200)
+            })
+            .catch((err) => {
+              return res.send({ message: 'Erro ao salvar moeda' })
+            })
+        } else return res.send({ message: 'Moeda não encontrada!' })
       })
   }
 })

@@ -37,13 +37,19 @@ router.get('/searchCurrency', (req, res) => {
     .then((currency) => {
       console.log(currency.data)
       if (currency.data.Response === 'Error')
-        res.status(404).send({ message: 'Moeda não encontrada' })
+        return res.status(404).send({ message: 'Moeda não encontrada' })
       else {
-        res.send({ currency: currency.data })
+        const coinInfo = currency.data.RAW[coinName.toUpperCase()].BRL
+        return res.send({
+          currency: coinInfo.FROMSYMBOL,
+          price: coinInfo.PRICE,
+          median: coinInfo.MEDIAN,
+          bestPriceToday: coinInfo.HIGH24HOUR,
+        })
       }
     })
     .catch((err) => {
-      res.status(400).send({ message: 'Erro ao pesquisar moeda!', err })
+      return res.status(400).send({ message: 'Erro ao pesquisar moeda!', err })
     })
 })
 
@@ -75,11 +81,12 @@ router.get('/historicalData', (req, res) => {
     )
     .then((result) => {
       const data = result.data.Data.Data.map((day) => {
-        
         const timeStamp = day.time
 
         const date = new Date(timeStamp * 1000)
-        const dayString = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+        const dayString = `${date.getDate()}/${
+          date.getMonth() + 1
+        }/${date.getFullYear()}`
         const temp = {
           time: dayString,
           price: day.close,

@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   Provider as PaperProvider,
   DefaultTheme,
@@ -18,6 +18,17 @@ import axios from 'axios';
 import SInfo from 'react-native-sensitive-info';
 
 const Stack = createStackNavigator();
+
+const useComponentWillMount = (func) => {
+  const willMount = useRef(true);
+
+  if (willMount.current) {
+    console.log('working')
+    func();
+  }
+
+  willMount.current = false;
+};
 
 export default App = ({}) => {
   const [visible, setVisible] = useState(false);
@@ -57,18 +68,37 @@ export default App = ({}) => {
       userToken: null,
     },
   );
-  useEffect(() => {
-    const bootstrapAsync = async () => {
-      let userToken;
-      try {
-        userToken = await SInfo.getItem('token',{});
-      } catch (e) {
-        dispatch({type: 'SIGN_OUT'});
-      }
-      dispatch({type: 'RESTORE_TOKEN', token: userToken});
-    };
-    bootstrapAsync();
-  }, []);
+
+  const bootstrapAsync = async () => {
+    let userToken;
+    try {
+      userToken = await SInfo.getItem('token', {});
+      const config = {
+        headers: {Authorization: `Bearer ${userToken}`},
+      };
+      //Checks token validation
+      axios
+        .get(
+          'http://192.168.15.16:5000/flukebackend/us-central1/app/user/',
+          config,
+        )
+        .then((res) => {
+          //token is valid
+          dispatch({type: 'RESTORE_TOKEN', token: userToken});
+        })
+        .catch(async (e) => {
+          //Renews token
+          userToken = await app.auth().currentUser.getIdToken(true);
+          await SInfo.setItem('token', userToken, {});
+          dispatch({type: 'RESTORE_TOKEN', token: userToken});
+        });
+    } catch (e) {
+      console.log(e.message);
+      dispatch({type: 'SIGN_OUT'});
+    }
+  };
+
+  useComponentWillMount(bootstrapAsync)
 
   const authContext = useMemo(
     () => ({
@@ -94,18 +124,20 @@ export default App = ({}) => {
       },
       signOut: () => {
         app.auth().signOut();
-        SInfo.deleteItem('token', {}).then(() => {
-          dispatch({type: 'SIGN_OUT'});
-        }).catch(err=>{
-          showModal('Erro ao realizar logout!');
-        })
+        SInfo.deleteItem('token', {})
+          .then(() => {
+            dispatch({type: 'SIGN_OUT'});
+          })
+          .catch((err) => {
+            showModal('Erro ao realizar logout!');
+          });
       },
       signUp: async (email, password, user) => {
         app
           .auth()
           .createUserWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
-            const token = await userRecord.user.getIdToken();
+            const token = await userRecord.user.getIdToken(true);
             const config = {
               headers: {Authorization: `Bearer ${token}`},
             };
