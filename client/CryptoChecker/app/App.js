@@ -16,7 +16,7 @@ import {app} from './config/firebase';
 import {NavigationContainer} from '@react-navigation/native';
 import axios from 'axios';
 import SInfo from 'react-native-sensitive-info';
-import { forceRefresh } from './config/getToken';
+import {forceRefresh} from './config/getToken';
 
 const Stack = createStackNavigator();
 
@@ -142,7 +142,7 @@ export default App = ({}) => {
           .auth()
           .createUserWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
-            const token = await forceRefresh(userRecord.user);;
+            const token = await forceRefresh(userRecord.user);
             const config = {
               headers: {Authorization: `Bearer ${token}`},
             };
@@ -182,7 +182,18 @@ export default App = ({}) => {
           <Stack.Navigator>
             {state.userToken == null ? (
               <>
-                <Stack.Screen name="Crypto Checker" component={Main} />
+                <Stack.Screen
+                  options={{
+                    headerStyle: {
+                      backgroundColor: '#0c3c4c',
+                    },
+                    headerTitleStyle: {
+                      color: '#ffffff',
+                    },
+                  }}
+                  name="Crypto Checker"
+                  component={Main}
+                />
                 <Stack.Screen name="Criar Conta" component={SignUp} />
               </>
             ) : (

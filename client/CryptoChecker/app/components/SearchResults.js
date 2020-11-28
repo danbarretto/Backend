@@ -33,11 +33,12 @@ const SearchResults = ({search, setCoinHistory}) => {
           </DataTable.Row>,
         ];
         setRows(row);
+        setLoading(false);
       })
       .catch((err) => {
         alert('Moeda não encontrada!');
+        setLoading(false);
       });
-    setLoading(false);
   };
 
   useEffect(() => {

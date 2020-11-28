@@ -70,7 +70,7 @@ const TopCurrencies = ({setCoinName}) => {
         {!loading && rows}
       </DataTable>
       <ActivityIndicator animating={loading} size={'large'} />
-      <Text style={{paddingLeft: 15}}>Tamanho do Rank</Text>
+      <Text style={{marginLeft: 15}}>Tamanho do Rank</Text>
       {!visible && (
         <NumberPicker
           style={styles.picker}
@@ -87,7 +87,8 @@ const TopCurrencies = ({setCoinName}) => {
 
 const styles = StyleSheet.create({
   picker: {
-    width:'30%'
+    width:'30%',
+    marginLeft:15
   },
 });
 
