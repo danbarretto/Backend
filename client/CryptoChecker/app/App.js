@@ -16,6 +16,7 @@ import {app} from './config/firebase';
 import {NavigationContainer} from '@react-navigation/native';
 import axios from 'axios';
 import SInfo from 'react-native-sensitive-info';
+import { forceRefresh } from './config/getToken';
 
 const Stack = createStackNavigator();
 
@@ -89,7 +90,7 @@ export default App = ({}) => {
         .catch(async (e) => {
           //Renews token
           if (app.auth().currentUser !== null) {
-            userToken = await app.auth().currentUser.getIdToken(true);
+            userToken = await forceRefresh();
             await SInfo.setItem('token', userToken, {});
             dispatch({type: 'RESTORE_TOKEN', token: userToken});
           } else {
@@ -111,7 +112,7 @@ export default App = ({}) => {
           .auth()
           .signInWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
-            const token = await userRecord.user.getIdToken(true);
+            const token = await forceRefresh(userRecord.user);
             SInfo.setItem('token', token, {})
               .then(() => {
                 dispatch({type: 'SIGN_IN', token: token});
@@ -141,7 +142,7 @@ export default App = ({}) => {
           .auth()
           .createUserWithEmailAndPassword(email, password)
           .then(async (userRecord) => {
-            const token = await userRecord.user.getIdToken(true);
+            const token = await forceRefresh(userRecord.user);;
             const config = {
               headers: {Authorization: `Bearer ${token}`},
             };

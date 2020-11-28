@@ -1,17 +1,20 @@
 import axios from 'axios';
 import React, {useState} from 'react';
-import {TextInput, Dialog, Button} from 'react-native-paper';
+import {TextInput, Dialog, Button, ActivityIndicator} from 'react-native-paper';
 import SInfo from 'react-native-sensitive-info';
+import {getToken} from '../config/getToken';
 const AddCoin = ({visibleInit, hideDialog, refreshData}) => {
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
   const [qtd, setQtd] = useState('');
 
   const sendData = async () => {
+    setLoading(true);
     if (code === '' || qtd === '') {
-      alert('Preencha todos os campos!')
+      alert('Preencha todos os campos!');
       return;
     }
-    const token = await SInfo.getItem('token', {});
+    const token = await getToken();
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,6 +27,7 @@ const AddCoin = ({visibleInit, hideDialog, refreshData}) => {
         config,
       )
       .then((res) => {
+        setLoading(false);
         if (res.data.message === undefined) {
           alert('Moeda cadastrada com sucesso!');
           refreshData();
@@ -35,27 +39,33 @@ const AddCoin = ({visibleInit, hideDialog, refreshData}) => {
         }
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.message);
+        setLoading(false);
       });
   };
 
   return (
     <Dialog visible={visibleInit} onDismiss={hideDialog}>
       <Dialog.Title>Adicionar Moeda</Dialog.Title>
-      <Dialog.Content>
-        <TextInput
-          label="Código"
-          onChangeText={(text) => setCode(text)}></TextInput>
-        <TextInput
-          keyboardType="numeric"
-          label="Quantidade"
-          style={{marginTop:10}}
-          onChangeText={(text) => setQtd(text)}></TextInput>
-      </Dialog.Content>
-      <Dialog.Actions>
-        <Button onPress={hideDialog}>Cancelar</Button>
-        <Button onPress={() => sendData()}>OK</Button>
-      </Dialog.Actions>
+      {loading && <ActivityIndicator animating={loading} size="large" />}
+      {!loading && (
+        <>
+          <Dialog.Content>
+            <TextInput
+              label="Código"
+              onChangeText={(text) => setCode(text)}></TextInput>
+            <TextInput
+              keyboardType="numeric"
+              label="Quantidade"
+              style={{marginTop: 10}}
+              onChangeText={(text) => setQtd(text)}></TextInput>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>Cancelar</Button>
+            <Button onPress={() => sendData()}>OK</Button>
+          </Dialog.Actions>
+        </>
+      )}
     </Dialog>
   );
 };

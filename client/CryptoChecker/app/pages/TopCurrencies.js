@@ -13,6 +13,7 @@ import NumberPicker from '../components/NumberPicker';
 const {width} = Dimensions.get('window');
 import {Col, Grid, Row} from 'react-native-easy-grid';
 import {ScrollView} from 'react-native-gesture-handler';
+import { getToken } from '../config/getToken';
 
 const TopCurrencies = ({setCoinName}) => {
   const [number, setNumber] = useState(10);
@@ -22,7 +23,7 @@ const TopCurrencies = ({setCoinName}) => {
 
   const fetchData = async () => {
     setLoading(true);
-    const token = await SInfo.getItem('token', {});
+    const token = await getToken()
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -36,41 +36,104 @@ router.post('/addUserToDb', async (req, res) => {
 router.post('/addCryptoCurrency', async (req, res) => {
   const { currency, qtd } = req.body
   const { uid } = req.user
-  const userRef = await admin.firestore().collection('users').doc(uid).get()
-  let oldCurrencies = userRef.get('currencies')
-  if (userRef.exists) {
-    for (curr of oldCurrencies) {
-      if (curr.Name === currency.toUpperCase()) {
-        return res.send({ message: 'Você já possui esta moeda!' })
-      }
-    }
+  try {
+    const userRef = await admin.firestore().collection('users').doc(uid).get()
+    if (userRef.exists) {
+      let oldCurrencies = userRef.get('currencies')
 
-    axios
-      .get(
-        `https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=BRL`,
-        apikey
-      )
-      .then((result) => {
-        if (result.data.Response !== 'Error') {
-          oldCurrencies.push({ Name: currency.toUpperCase(), Quantidade: qtd })
-          userRef.ref
-            .set({ currencies: oldCurrencies })
-            .then(() => {
-              return res.sendStatus(200)
-            })
-            .catch((err) => {
-              return res.send({
-                message: 'Erro ao salvar moeda ' + err.message,
-              })
-            })
+      if (oldCurrencies !== null && oldCurrencies !== undefined) {
+        for (curr of oldCurrencies) {
+          if (curr.Name === currency.toUpperCase()) {
+            return res.send({ message: 'Você já possui esta moeda!' })
+          }
         }
-        return res.send({ message: 'Moeda não encontrada!' })
+      }
+      axios
+        .get(
+          `https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=BRL`,
+          apikey
+        )
+        .then((result) => {
+          if (result.data.Response !== 'Error') {
+            oldCurrencies.push({
+              Name: currency.toUpperCase(),
+              Quantidade: qtd,
+            })
+            userRef.ref
+              .set({ currencies: oldCurrencies })
+              .then(() => {
+                return res.sendStatus(200)
+              })
+              .catch((err) => {
+                return res.send({
+                  message: 'Erro ao salvar moeda ' + err.message,
+                })
+              })
+              return
+          }else return res.send({ message: 'Moeda não encontrada!' })
+        })
+        .catch((err) => {
+          return res.send({ message: 'Erro ao resgatar preços ' + err.message })
+        })
+    }else return res.send({ message: 'Usuário não encontrado!' })
+  } catch (err) {
+    return res.send({ message: 'Erro ' + err.message })
+  }
+})
+
+router.post('/editCurrency', async (req, res) => {
+  const { currency, qtd } = req.body
+  const { uid } = req.user
+  console.log('ayyys')
+  console.log(uid)
+  const userRef = await admin.firestore().collection('users').doc(uid).get()
+  if (userRef.exists) {
+    const currencies = userRef.get('currencies').map((curr) => {
+      if (curr.Name === currency.toUpperCase()) {
+        curr.Quantidade = qtd
+      }
+      return curr
+    })
+    userRef.ref
+      .update({ currencies })
+      .then(() => {
+        return res.sendStatus(200)
       })
       .catch((err) => {
-        return res.send({ message: 'Erro ao resgatar preços ' + err.message })
+        console.log(err)
+        return res.send({ message: 'Erro ao atualizar moeda' })
       })
+  } else {
+    return res.send({ message: 'Usuário não encontrado' })
   }
-  return res.send({ message: 'Usuário não encontrado!' })
+})
+
+router.post('/deleteCurrency', async (req, res) => {
+  const { currency } = req.body
+  const { uid } = req.user
+  console.log('ayyys')
+  console.log(uid)
+  const userRef = await admin.firestore().collection('users').doc(uid).get()
+  if (userRef.exists) {
+    const currencies = userRef
+      .get('currencies')
+      .filter((curr) => {
+        return curr.Name !== currency.toUpperCase()
+      })
+      .map((curr) => curr)
+
+    userRef.ref
+      .update({ currencies })
+      .then(() => {
+        return res.sendStatus(200)
+      })
+      .catch((err) => {
+        console.log(err)
+        return res.send({ message: 'Erro ao atualizar moeda' })
+      })
+  } else {
+    return res.send({ message: 'Usuário não encontrado' })
+  }
 })
 
 router.get('/getCurrencies', async (req, res) => {

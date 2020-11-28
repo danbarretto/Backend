@@ -6,6 +6,7 @@ import SInfo from 'react-native-sensitive-info';
 import axios from 'axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import NumberPicker from '../components/NumberPicker';
+import { getToken } from '../config/getToken';
 const {width} = Dimensions.get('window')
 
 const CoinHistory = ({coinName, setCoinName}) => {
@@ -16,7 +17,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
 
   const fetchData = async () => {
     setLoading(true);
-    const token = await SInfo.getItem('token', {});
+    const token = await getToken()
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,

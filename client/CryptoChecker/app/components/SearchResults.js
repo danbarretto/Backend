@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, DataTable} from 'react-native-paper';
 import axios from 'axios';
 import SInfo from 'react-native-sensitive-info';
+import { getToken } from '../config/getToken';
 
 const SearchResults = ({search, setCoinHistory}) => {
   const [rows, setRows] = useState([]);
@@ -10,7 +11,7 @@ const SearchResults = ({search, setCoinHistory}) => {
   const fetchData = async () => {
     setLoading(true);
     const url = `https://us-central1-flukebackend.cloudfunctions.net/app/api/searchCurrency?coinName=${search}`;
-    const token = await SInfo.getItem('token', {});
+    const token = await getToken()
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
