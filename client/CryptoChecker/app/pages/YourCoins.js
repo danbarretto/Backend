@@ -1,15 +1,22 @@
 import React, {useEffect, useState, useContext} from 'react';
-import {Button, DataTable, ActivityIndicator, FAB} from 'react-native-paper';
+import {
+  Button,
+  DataTable,
+  ActivityIndicator,
+  FAB,
+  Title,
+} from 'react-native-paper';
 import axios from 'axios';
 import {StyleSheet, View, ScrollView} from 'react-native';
 import AuthContext from '../components/AuthContext';
 import SInfo from 'react-native-sensitive-info';
 import AddCoin from '../components/AddCoin';
 
-const YourCoins = ({setCoinName}) => {
+const YourCoins = ({setCoinName }) => {
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [addCoin, setAddCoin] = useState(false);
+  const [userName, setUserName] = useState('');
   let config;
   const {showErrorModal} = useContext(AuthContext);
   const fetchData = async () => {
@@ -26,13 +33,22 @@ const YourCoins = ({setCoinName}) => {
         config,
       )
       .then(async (result) => {
+        if (result.data.message !== undefined) {
+          showErrorModal('Você não possui nenhuma cripto moeda cadastrada!');
+          setUserName(result.data.userName);
+          setLoading(false);
+          return;
+        }
         const coins = result.data.currencies.map((curr) => curr.Name);
         const prices = await axios.post(
           'https://us-central1-flukebackend.cloudfunctions.net/app/api/getPrices',
           {names: coins},
           config,
         );
+
         let currencies = result.data.currencies;
+        setUserName(result.data.userName);
+
         currencies = currencies.map((curr) => ({
           ...curr,
           price: prices.data[curr.Name].BRL,
@@ -58,8 +74,8 @@ const YourCoins = ({setCoinName}) => {
         setRows(newRows);
         setLoading(false);
       })
-      .catch((err) => {
-        showErrorModal(err.message);
+      .catch(() => {
+        alert('Erro ao resgatar moedas!');
       });
   };
 
@@ -69,15 +85,20 @@ const YourCoins = ({setCoinName}) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title>Moeda</DataTable.Title>
-          <DataTable.Title numberOfLines={2}>Valor Un (R$)</DataTable.Title>
-          <DataTable.Title>Quantidade</DataTable.Title>
-          <DataTable.Title numberOfLines={2}>Total (R$)</DataTable.Title>
-        </DataTable.Header>
-        {!loading && rows}
-      </DataTable>
+      {!loading && (
+        <>
+          <Title>Bem-vindo(a) {userName}!</Title>
+          <DataTable>
+            <DataTable.Header>
+              <DataTable.Title>Moeda</DataTable.Title>
+              <DataTable.Title numberOfLines={2}>Valor Un (R$)</DataTable.Title>
+              <DataTable.Title>Quantidade</DataTable.Title>
+              <DataTable.Title numberOfLines={2}>Total (R$)</DataTable.Title>
+            </DataTable.Header>
+            {rows}
+          </DataTable>
+        </>
+      )}
       <AddCoin
         refreshData={() => fetchData()}
         visibleInit={addCoin}
@@ -92,8 +113,6 @@ const YourCoins = ({setCoinName}) => {
           onPress={() => setAddCoin(true)}
         />
       ) : null}
-
-
     </ScrollView>
   );
 };

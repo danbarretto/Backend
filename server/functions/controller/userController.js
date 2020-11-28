@@ -59,7 +59,9 @@ router.post('/addCryptoCurrency', async (req, res) => {
               return res.sendStatus(200)
             })
             .catch((err) => {
-              return res.send({ message: 'Erro ao salvar moeda '+err.message })
+              return res.send({
+                message: 'Erro ao salvar moeda ' + err.message,
+              })
             })
         }
         return res.send({ message: 'Moeda não encontrada!' })
@@ -74,12 +76,19 @@ router.post('/addCryptoCurrency', async (req, res) => {
 router.get('/getCurrencies', async (req, res) => {
   const uid = req.user.uid
   const userRef = await admin.firestore().collection('users').doc(uid).get()
-  if (userRef.exists) {
-    return res.send({ currencies: userRef.get('currencies') })
+  if (
+    userRef.get('currencies') !== null &&
+    userRef.get('currencies') !== undefined
+  ) {
+    return res.send({
+      currencies: userRef.get('currencies'),
+      userName: userRef.get('userName'),
+    })
   }
-  return res
-    .status(404)
-    .send({ message: 'Você não possui nenhuma cripto moeda cadastrada!' })
+  return res.send({
+    message: 'Você não possui nenhuma cripto moeda cadastrada!',
+    userName: userRef.get('userName'),
+  })
 })
 
 module.exports = (app) => app.use('/user', router)

@@ -20,15 +20,12 @@ const TopCurrencies = ({setCoinName}) => {
   const [loading, setLoading] = useState(true);
   const [visible, setVisible] = useState(false);
 
-
   const fetchData = async () => {
     setLoading(true);
     const token = await SInfo.getItem('token', {});
     const config = {
       headers: {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        Authorization: `Bearer ${token}`,
       },
     };
     axios
@@ -58,7 +55,7 @@ const TopCurrencies = ({setCoinName}) => {
   };
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [number]);
 
   return (
     <ScrollView>
@@ -73,33 +70,23 @@ const TopCurrencies = ({setCoinName}) => {
       </DataTable>
       <ActivityIndicator animating={loading} size={'large'} />
       <Text style={{paddingLeft: 15}}>Tamanho do Rank</Text>
-      {!visible && <Grid style={{padding: 15}}>
-        <Col>
-          <NumberPicker
-            closeMenu={() => setMenuVisible(false)}
-            values={[10, 20, 30]}
-            label="Tamanho do Rank"
-            number={number}
-            setNumber={setNumber}
-          />
-        </Col>
-        <Col>
-          <Button
-            mode="contained"
-            style={styles.picker}
-            onPress={() => fetchData()}>
-            Carregar
-          </Button>
-        </Col>
-      </Grid>}
+      {!visible && (
+        <NumberPicker
+          style={styles.picker}
+          closeMenu={() => setMenuVisible(false)}
+          values={[10, 20, 30]}
+          label="Tamanho do Rank"
+          number={number}
+          setNumber={setNumber}
+        />
+      )}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   picker: {
-    //marginTop: 15,
-    marginBottom: 15,
+    width:'30%'
   },
 });
 

@@ -7,10 +7,11 @@ const AppBarMenu = ({visible, closeMenu, anchorButton}) => {
   return (
     <Menu visible={visible} onDismiss={closeMenu} anchor={anchorButton}>
       <Menu.Item
+        key="1"
         title="Logout"
         onPress={() => {
           signOut();
-          closeMenu()
+          closeMenu();
         }}
       />
     </Menu>

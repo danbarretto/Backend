@@ -23,7 +23,7 @@ const useComponentWillMount = (func) => {
   const willMount = useRef(true);
 
   if (willMount.current) {
-    console.log('working')
+    console.log('working');
     func();
   }
 
@@ -88,9 +88,13 @@ export default App = ({}) => {
         })
         .catch(async (e) => {
           //Renews token
-          userToken = await app.auth().currentUser.getIdToken(true);
-          await SInfo.setItem('token', userToken, {});
-          dispatch({type: 'RESTORE_TOKEN', token: userToken});
+          if (app.auth().currentUser !== null) {
+            userToken = await app.auth().currentUser.getIdToken(true);
+            await SInfo.setItem('token', userToken, {});
+            dispatch({type: 'RESTORE_TOKEN', token: userToken});
+          } else {
+            dispatch({type: 'SIGN_OUT'});
+          }
         });
     } catch (e) {
       console.log(e.message);
@@ -98,7 +102,7 @@ export default App = ({}) => {
     }
   };
 
-  useComponentWillMount(bootstrapAsync)
+  useComponentWillMount(bootstrapAsync);
 
   const authContext = useMemo(
     () => ({
