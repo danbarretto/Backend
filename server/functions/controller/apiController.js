@@ -38,7 +38,6 @@ router.get('/searchCurrency', (req, res) => {
       apikey
     )
     .then((currency) => {
-      console.log(currency.data)
       if (currency.data.Response === 'Error')
         return res.status(404).send({ message: 'Moeda não encontrada' })
       else {
@@ -62,7 +61,6 @@ router.post('/getPrices', (req, res) => {
   names.forEach((name) => {
     namesUrl += name + ','
   })
-  console.log(namesUrl)
   const url = `https://min-api.cryptocompare.com/data/pricemulti?fsyms=${namesUrl}&tsyms=BRL`
   axios
     .get(url, apikey)

@@ -86,9 +86,8 @@ router.post('/addCryptoCurrency', async (req, res) => {
 
 router.post('/editCurrency', async (req, res) => {
   const { currency, qtd } = req.body
+  if(qtd<=0) return res.send({message:'A quantidade deve ser maior que 0!'})
   const { uid } = req.user
-  console.log('ayyys')
-  console.log(uid)
   const userRef = await admin.firestore().collection('users').doc(uid).get()
   if (userRef.exists) {
     const currencies = userRef.get('currencies').map((curr) => {
