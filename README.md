@@ -9,7 +9,7 @@ Para executar este programa, utilize o seguinte comando:
 `node arr.js`
 
 ## React-Native App Crypto Checker
-
+### Executar Android
 Para executar este programa em modo de debug android, utilize os seguintes comandos:
 
 ```
@@ -21,6 +21,13 @@ Em seguida, em outro terminal execute:
 
 ```
 react-native run android
+```
+
+### Build
+Para compilar o app para android execute os seguintes comandos:
+```
+    cd cd client/CryptoChecker/android
+    ./gradlew app:assembleRelease
 ```
 
 Author: Daniel Sá Barretto Prado Garcia
