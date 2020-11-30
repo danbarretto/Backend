@@ -15,7 +15,6 @@ router.get('/', async (req, res) => {
 router.post('/addUserToDb', async (req, res) => {
   const { userName } = req.body
   const { uid } = req.user
-  console.log(req.body)
   admin
     .firestore()
     .collection('users')
@@ -62,7 +61,10 @@ router.post('/addCryptoCurrency', async (req, res) => {
               Quantidade: qtd,
             })
             try {
-              await userRef.ref.set({ currencies: oldCurrencies })
+              await userRef.ref.set({
+                userName: userRef.get('userName'),
+                currencies: oldCurrencies,
+              })
               return res.sendStatus(200)
             } catch (err) {
               return res.send({
