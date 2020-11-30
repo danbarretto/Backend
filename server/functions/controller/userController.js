@@ -95,7 +95,7 @@ router.post('/editCurrency', async (req, res) => {
       return curr
     })
     userRef.ref
-      .update({ currencies })
+      .update({ userName:userRef.get('userName'), currencies })
       .then(() => {
         return res.sendStatus(200)
       })

@@ -6,8 +6,8 @@ import SInfo from 'react-native-sensitive-info';
 import axios from 'axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import NumberPicker from '../components/NumberPicker';
-import { getToken } from '../config/getToken';
-const {width} = Dimensions.get('window')
+import {getToken} from '../config/getToken';
+const {width} = Dimensions.get('window');
 
 const CoinHistory = ({coinName, setCoinName}) => {
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
 
   const fetchData = async () => {
     setLoading(true);
-    const token = await getToken()
+    const token = await getToken();
     const config = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -41,7 +41,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [number]);
 
   return (
     <View style={{padding: 15}}>
@@ -58,6 +58,12 @@ const CoinHistory = ({coinName, setCoinName}) => {
             }}
             width={1000 * (number / 10)} // from react-native
             height={430}
+            formatYLabel={(value) => {
+              if(value>=1000){
+                return (value/1000).toFixed(2).toString() + 'k'
+              }
+              return value
+            }}
             yAxisLabel="R$"
             verticalLabelRotation={50}
             ver={45}
@@ -90,6 +96,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
         </ScrollView>
       )}
       <ActivityIndicator animating={loading} size="large" />
+      <Text>Dias</Text>
       <View style={styles.frame}>
         <NumberPicker
           closeMenu={() => setMenuVisible(false)}
@@ -99,14 +106,9 @@ const CoinHistory = ({coinName, setCoinName}) => {
           number={number}
           setNumber={setNumber}
         />
+
         <Button
           mode="contained"
-          style={styles.picker}
-          onPress={() => fetchData()}>
-          Carregar
-        </Button>
-        <Button
-          mode="outlined"
           style={styles.picker}
           onPress={() => setCoinName('')}>
           Voltar
@@ -118,7 +120,7 @@ const CoinHistory = ({coinName, setCoinName}) => {
 
 const styles = StyleSheet.create({
   picker: {
-    width: width/3,
+    width: width / 2 - 15,
     marginTop: 15,
     marginBottom: 15,
     alignItems: 'center',
@@ -127,7 +129,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
+
     justifyContent: 'flex-start',
+
     width: width,
   },
 });
