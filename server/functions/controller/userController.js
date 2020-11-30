@@ -47,35 +47,36 @@ router.post('/addCryptoCurrency', async (req, res) => {
             return res.send({ message: 'Você já possui esta moeda!' })
           }
         }
+      } else {
+        oldCurrencies = []
       }
       axios
         .get(
           `https://min-api.cryptocompare.com/data/price?fsym=${currency}&tsyms=BRL`,
           apikey
         )
-        .then((result) => {
+        .then(async (result) => {
           if (result.data.Response !== 'Error') {
             oldCurrencies.push({
               Name: currency.toUpperCase(),
               Quantidade: qtd,
             })
-            userRef.ref
-              .set({ currencies: oldCurrencies })
-              .then(() => {
-                return res.sendStatus(200)
+            try {
+              await userRef.ref.set({ currencies: oldCurrencies })
+              return res.sendStatus(200)
+            } catch (err) {
+              return res.send({
+                message: 'Erro ao salvar moeda ' + err.message,
               })
-              .catch((err) => {
-                return res.send({
-                  message: 'Erro ao salvar moeda ' + err.message,
-                })
-              })
-              return
-          }else return res.send({ message: 'Moeda não encontrada!' })
+            }
+          } else return res.send({ message: 'Moeda não encontrada!' })
         })
         .catch((err) => {
-          return res.send({ message: 'Erro ao resgatar preços ' + err.message })
+          return res.send({
+            message: 'Erro ao resgatar preços ' + err.message,
+          })
         })
-    }else return res.send({ message: 'Usuário não encontrado!' })
+    } else return res.send({ message: 'Usuário não encontrado!' })
   } catch (err) {
     return res.send({ message: 'Erro ' + err.message })
   }
@@ -95,7 +96,7 @@ router.post('/editCurrency', async (req, res) => {
       return curr
     })
     userRef.ref
-      .update({ userName:userRef.get('userName'), currencies })
+      .update({ userName: userRef.get('userName'), currencies })
       .then(() => {
         return res.sendStatus(200)
       })
