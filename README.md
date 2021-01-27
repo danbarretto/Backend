@@ -20,7 +20,7 @@ rm -rf $TMPDIR/react-* && rm -rf $TMPDIR/metro-* && rm -rf $TMPDIR/haste-* && wa
 Em seguida, em outro terminal execute:
 
 ```
-react-native run android
+react-native run-android
 ```
 
 ### Build
