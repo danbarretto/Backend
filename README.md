@@ -26,7 +26,7 @@ react-native run android
 ### Build
 Para compilar o app para android execute os seguintes comandos:
 ```
-    cd cd client/CryptoChecker/android
+    cd client/CryptoChecker/android
     ./gradlew app:assembleRelease
 ```
 
